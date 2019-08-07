@@ -22,7 +22,11 @@
         </form>
         <form action="EditUserTags" method="POST">
                 {% csrf_token %}
-            <button type="submit" name="TagAssign">Assign New Tags To Existing User</button>
+            <button type="submit" name="TagAssign">Edit Tags for Users</button>
+        </form>
+        <form action="EditLocTags" method="POST">
+            {% csrf_token %}
+        <button type="submit" name="TagAssign">Edit Tags for Locations</button>
         </form>
         <script src="" async defer></script>
     </body>

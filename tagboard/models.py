@@ -36,3 +36,14 @@ class Users(models.Model):
 
     def get_absolute_url(self):
         return reversed("_detail", kwargs={"pk": self.pk})
+
+class Locations(models.Model):
+
+    locname = models.CharField(max_length=50,primary_key=True)
+    tags = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reversed("_detail", kwargs={"pk": self.pk})

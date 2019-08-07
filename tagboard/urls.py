@@ -8,11 +8,16 @@ urlpatterns = [
     path('newpt',views.NewPartTag),
     path('addlt',views.addLocTag),
     path('addpt',views.addPartTag),
-    path('EditUserTags',views.EditUserTags),
-    path('ModifyUser',views.ModifyUser),
-    path('DeleteTag',views.DeleteTag),
-    path('AddUserTag',views.AddUserTag),
-    path('AddUTag',views.AddUTag),
     path('DelLocTag',views.DelLocTag),
-    path('DelPartTag',views.DelPartTag)
+    path('DelPartTag',views.DelPartTag),
+    path('EditUserTags',views.EditUserTags),
+    path('EditLocTags',views.EditLocTags),
+    path('ModifyUser',views.ModifyUser),
+    path('ModifyLoc',views.ModifyLoc),
+    path('DeleteTag',views.DeleteTag),
+    path('DeleteLocTag',views.DeleteLocTag),
+    path('AddUserTag',views.AddUserTag),
+    path('AddLocTag',views.AddLocTag),
+    path('AddUTag',views.AddUTag),
+    path('AddLTag',views.AddLTag)
 ]

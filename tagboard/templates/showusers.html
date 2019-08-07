@@ -15,7 +15,7 @@
     <table>
         <tr>
             <th>User ID</th>
-            <th>Modify User</th>
+            <th>Modify User Tags</th>
         </tr>
         {% for row in users %}
         <tr>
@@ -26,7 +26,7 @@
                <input type="hidden" name="uid" id="uid" value= {{ row.uid }}>
             </td>
             <td>    
-                <button type="submit">Change Value</button> 
+                <button type="submit">Change Tags</button> 
             </td>
             </form>
         </tr>

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.template import RequestContext
-from .models import LocTags,PartTags,Users
+from .models import LocTags,PartTags,Users,Locations
 from . import forms
 import sqlite3, string
 from django.views.decorators.csrf import csrf_protect
@@ -82,19 +82,20 @@ def DeleteTag(request):
     if(request.method=="POST"):
         f = forms.DeleteTagForm(request.POST)
         if(f.is_valid()):
-            d = f.cleaned_data
+            d = request.POST.get('uid')
+            t = request.POST.get('tag')
             conn = sqlite3.connect('db.sqlite3')
             cur = conn.cursor()
-            cur.execute('select tags from tagboard_users where uid = ?;',(d['uid'],))
+            cur.execute('select tags from tagboard_users where uid = ?;',(d,))
             row = cur.fetchone()
             s = ''.join(row)
             l = s.split(',')
             s = ''
             for entry in l:
-                if(entry != d['tag']):
-                    s += entry+','
-            s = s[:len(s)-1:1]
-            cur.execute('update tagboard_users set tags = ? where uid = ?;',(s,d['uid'])) 
+                if(entry != t):
+                    s += ','+entry
+            s = s[1:]
+            cur.execute('update tagboard_users set tags = ? where uid = ?;',(s,d,)) 
             conn.commit()
             conn.close()
             return(ModifyUser(request))
@@ -116,7 +117,8 @@ def AddUTag(request):
             if(t in l):
                 return(AddUserTag(request,'The tag already exists'))
             else:
-                s += ','+t 
+                s += ','+t
+                s = s[1:] 
                 conn = sqlite3.connect('db.sqlite3')
                 cur = conn.cursor()
                 cur.execute('update tagboard_users set tags = ? where uid = ?;',(s,u,))  
@@ -143,3 +145,67 @@ def DelPartTag(request):
         conn.commit()
         conn.close()
         return(PartTagPage(request))
+
+
+def EditLocTags(request,error=''):
+    all_locations = Locations.objects.all()
+    return(render(request,'showlocs.html',{'locations':all_locations,'error':error}))
+
+def ModifyLoc(request):
+   if(request.method=="POST"):
+        f = forms.EditLocTagForm(request.POST)
+        tags = ''.join(f.retrieveTag())
+        if(tags is None):
+            error = "No such location exists"
+            return(EditLocTags(request,error))
+        else:
+            taglist = tags.split(',')
+            return(render(request,'modlt.html',{'tags':taglist,"locname":request.POST.get('locname')}))
+
+
+def AddLocTag(request,error=''):
+    if(request.method=="POST"):
+        return(render(request,'addloct.html',{'locname':request.POST.get('locname'),'ErrorMessage':error}))
+
+
+def DeleteLocTag(request):
+    if(request.method=="POST"):
+        f = forms.DeleteLocTagForm(request.POST)
+        if(f.is_valid()):
+            d = request.POST.get('locname')
+            t = request.POST.get('tag')
+            conn = sqlite3.connect('db.sqlite3')
+            cur = conn.cursor()
+            cur.execute('select tags from tagboard_locations where locname = ?;',(d,))
+            row = cur.fetchone()
+            s = ''.join(row)
+            l = s.split(',')
+            s = ''
+            for entry in l:
+                if(entry != t):
+                    s += ','+entry
+            s = s[1:]
+            cur.execute('update tagboard_locations set tags = ? where locname = ?;',(s,d,)) 
+            conn.commit()
+            conn.close()
+            return(ModifyLoc(request))
+
+def AddLTag(request):
+    if(request.method=='POST'):
+        f = forms.AddLocTagForm(request.POST)
+        s = f.retrieveTags()
+        if(s is not None):
+            l = s.split(',')      
+            t = request.POST.get('tag')
+            u = request.POST.get('locname')
+            if(t in l):
+                return(AddLocTag(request,'The tag already exists'))
+            else:
+                s += ','+t
+                s = s[1:] 
+                conn = sqlite3.connect('db.sqlite3')
+                cur = conn.cursor()
+                cur.execute('update tagboard_locations set tags = ? where locname = ?;',(s,u,))  
+                conn.commit()
+                conn.close()
+                return(AddLocTag(request,'Tag Successfully Added'))

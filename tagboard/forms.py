@@ -43,6 +43,10 @@ class DeleteTagForm(forms.Form):
     uid = forms.CharField(max_length=50)
     tag = forms.CharField()
 
+class DeleteLocTagForm(forms.Form):
+    locname = forms.CharField(max_length=50)
+    tag = forms.CharField()
+
 class AddTagForm(forms.Form):
     uid = forms.CharField(max_length=50)
     tag = forms.CharField()
@@ -55,6 +59,34 @@ class AddTagForm(forms.Form):
             uid = cd['uid']
             tag = cd['tag']
             cur.execute('select tags from tagboard_users where uid = ?;',(uid,))
+            res = cur.fetchone()
+            s = ''.join(res,)
+            return(s)
+    
+class EditLocTagForm(forms.Form):
+    locname = forms.CharField(max_length=50, required=True)
+    def retrieveTag(self):
+        if(self.is_valid()):
+            conn = sqlite3.connect('db.sqlite3')
+            cur = conn.cursor()
+            data = self.cleaned_data['locname']
+            cur.execute('select tags from tagboard_locations where locname = ?;',(data,))
+            row = cur.fetchone()
+            return(row)
+
+
+class AddLocTagForm(forms.Form):
+    locname = forms.CharField(max_length=50)
+    tag = forms.CharField()
+
+    def retrieveTags(self):
+        if(self.is_valid()):
+            conn = sqlite3.connect('db.sqlite3')
+            cur = conn.cursor()
+            cd = self.cleaned_data
+            locname = cd['locname']
+            tag = cd['tag']
+            cur.execute('select tags from tagboard_locations where locname = ?;',(locname,))
             res = cur.fetchone()
             s = ''.join(res,)
             return(s)
