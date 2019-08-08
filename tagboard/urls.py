@@ -19,5 +19,6 @@ urlpatterns = [
     path('AddUserTag',views.AddUserTag),
     path('AddLocTag',views.AddLocTag),
     path('AddUTag',views.AddUTag),
-    path('AddLTag',views.AddLTag)
+    path('AddLTag',views.AddLTag),
+    path('SearchPage',views.SearchPage)
 ]

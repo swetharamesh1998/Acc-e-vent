@@ -19,7 +19,13 @@
         <form action ="addlt" method="post">
             {% csrf_token %}
             <button type="submit" name="addtag">Add another tag</button>
-        </form> 
+        </form>
+        <form action="SearchPage" method="post">
+            {% csrf_token %}
+            <input type="text" name="searchtag" id="searchtag" placeholder="Enter the tag to search">
+            <button type="submit">Search</button>
+            <input type="hidden" name="tablename" id="tablename" value="ltb">
+          </form> 
         <table>
            <tr>
               <th>Tag Name</th>

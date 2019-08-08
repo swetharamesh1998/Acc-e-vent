@@ -12,6 +12,12 @@
         {% csrf_token %}
         <button type="submit">Go Back To Menu</button>
     </form>
+    <form action="SearchPage" method="post">
+            {% csrf_token %}
+            <input type="text" name="searchtag" id="searchtag" placeholder="Enter the location to search">
+            <button type="submit">Search</button>
+            <input type="hidden" name="tablename" id="tablename" value="loc_name">
+    </form>
     <table>
         <tr>
             <th>Location Name</th>

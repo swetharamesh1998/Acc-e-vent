@@ -1,4 +1,5 @@
 from django import forms
+from django.shortcuts import render
 import sqlite3
 class PartTagForm(forms.Form):
     tagname = forms.CharField(max_length=50, required=True)
@@ -90,3 +91,7 @@ class AddLocTagForm(forms.Form):
             res = cur.fetchone()
             s = ''.join(res,)
             return(s)
+
+class SearchForm(forms.Form):
+    searchtag = forms.CharField()
+    tablename = forms.CharField()

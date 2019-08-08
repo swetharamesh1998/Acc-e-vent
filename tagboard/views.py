@@ -8,12 +8,12 @@ from django.views.decorators.csrf import csrf_protect
 # Create your views here.
 @csrf_protect
 def LocTagPage(request):
-    query_request = LocTags.objects.all()
+    query_request = LocTags.objects.all().order_by('tagname')
     return(render(request,'loctagboard.html',{'obj': query_request}))
 
 
 def PartTagPage(request):
-    query_set = PartTags.objects.all()
+    query_set = PartTags.objects.all().order_by('tagname')
     return(render(request,'parttagboard.html',{'object': query_set}))
 
 def HomePage(request):
@@ -75,6 +75,7 @@ def ModifyUser(request):
             return(EditUserTags(request,error))
         else:
             taglist = tags.split(',')
+            taglist.sort()
             return(render(request,'modut.html',{'tags':taglist,"uid":request.POST.get('uid')}))
 
 
@@ -90,11 +91,13 @@ def DeleteTag(request):
             row = cur.fetchone()
             s = ''.join(row)
             l = s.split(',')
+            l.sort()
             s = ''
             for entry in l:
                 if(entry != t):
                     s += ','+entry
-            s = s[1:]
+                    if(s[0] == ','):
+                        s = s[1:]
             cur.execute('update tagboard_users set tags = ? where uid = ?;',(s,d,)) 
             conn.commit()
             conn.close()
@@ -111,14 +114,17 @@ def AddUTag(request):
         f = forms.AddTagForm(request.POST)
         s = f.retrieveTags()
         if(s is not None):
-            l = s.split(',')      
+            s = ''.join(s)
+            l = s.split(',')
+            l.sort()      
             t = request.POST.get('tag')
             u = request.POST.get('uid')
             if(t in l):
                 return(AddUserTag(request,'The tag already exists'))
             else:
                 s += ','+t
-                s = s[1:] 
+                if(s[0] == ','):
+                    s = s[1:] 
                 conn = sqlite3.connect('db.sqlite3')
                 cur = conn.cursor()
                 cur.execute('update tagboard_users set tags = ? where uid = ?;',(s,u,))  
@@ -160,6 +166,7 @@ def ModifyLoc(request):
             return(EditLocTags(request,error))
         else:
             taglist = tags.split(',')
+            taglist.sort()
             return(render(request,'modlt.html',{'tags':taglist,"locname":request.POST.get('locname')}))
 
 
@@ -180,11 +187,13 @@ def DeleteLocTag(request):
             row = cur.fetchone()
             s = ''.join(row)
             l = s.split(',')
+            l.sort()
             s = ''
             for entry in l:
                 if(entry != t):
                     s += ','+entry
-            s = s[1:]
+                    if(s[0] == ','):
+                        s = s[1:]
             cur.execute('update tagboard_locations set tags = ? where locname = ?;',(s,d,)) 
             conn.commit()
             conn.close()
@@ -195,17 +204,38 @@ def AddLTag(request):
         f = forms.AddLocTagForm(request.POST)
         s = f.retrieveTags()
         if(s is not None):
-            l = s.split(',')      
+            l = s.split(',') 
+            l.sort()     
             t = request.POST.get('tag')
             u = request.POST.get('locname')
             if(t in l):
                 return(AddLocTag(request,'The tag already exists'))
             else:
                 s += ','+t
-                s = s[1:] 
+                if(s[0] == ','):
+                    s = s[1:] 
                 conn = sqlite3.connect('db.sqlite3')
                 cur = conn.cursor()
                 cur.execute('update tagboard_locations set tags = ? where locname = ?;',(s,u,))  
                 conn.commit()
                 conn.close()
                 return(AddLocTag(request,'Tag Successfully Added'))
+
+def SearchPage(request):
+    if(request.method == "POST"):
+        f = forms.SearchForm(request.POST)
+        if(f.is_valid()):
+            tn = request.POST.get('tablename')
+            s = request.POST.get('searchtag')
+            if(tn == 'loc_name'):
+                query = Locations.objects.filter(locname=s)
+                return(render(request,'showlocs.html',{'locations':query,'error':''}))
+            elif(tn == 'user_id'):
+                query = Users.objects.filter(uid=s)
+                return(render(request,'showusers.html',{'users':query,'error':''}))
+            elif(tn == 'ptb'):
+                query = PartTags.objects.filter(tagname=s).values_list('tagname',flat=True)
+                return(render(request,'parttagboard.html',{'obj':query}))
+            elif(tn == 'ltb'):
+                query = LocTags.objects.filter(tagname=s).values_list('tagname',flat=True)
+                return(render(request,'loctagboard.html',{'obj':query}))
